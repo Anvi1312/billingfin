@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Invoice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  <!-- Font Awesome for icons -->
+    <style>
+        /* Your custom CSS for styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .btn {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background-color: #f44336;
+        }
+        .btn-add {
+            background-color: #2196F3;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Invoice</h1>
+    <form method="POST" action="{% url 'generate_invoice' %}">
+        {% csrf_token %}
+        <table id="invoice-table">
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice_items %}
+                    <tr>
+                        <td>
+                            <select name="medicines" class="medicine-select">
+                                {% for medicine in medicines %}
+                                    <option value="{{ medicine.id }}" {% if item.medicine.id == medicine.id %}selected{% endif %}>
+                                        {{ medicine.name }} - Available: {{ medicine.stock }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td><input type="number" name="quantity" class="quantity" value="{{ item.quantity }}" min="1" max="{{ item.medicine.stock }}" required></td>
+                        <td><input type="text" name="price" value="{{ item.price }}" readonly></td>
+                        <td>
+                            <button type="button" class="btn btn-danger delete-row">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <button type="button" class="btn btn-add" id="add-row">Add Another Medicine</button>
+        br
+        <button type="submit" class="btn">Generate Invoice</button>
+    </form>
+
+    <script>
+        // Function to handle row deletion
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-row')) {
+                e.target.closest('tr').remove();
+            }
+        });
+
+        // Function to add a new row
+        document.getElementById('add-row').addEventListener('click', function() {
+            const tableBody = document.querySelector('#invoice-table tbody');
+            const newRow = document.createElement('tr');
+
+            newRow.innerHTML = `
+                <td>
+                    <select name="medicines" class="medicine-select">
+                        {% for medicine in medicines %}
+                            <option value="{{ medicine.id }}">
+                                {{ medicine.name }} - Available: {{ medicine.stock }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td><input type="number" name="quantity" class="quantity" value="1" min="1" required></td>
+                <td><input type="text" name="price" value="" readonly></td>
+                <td>
+                    <button type="button" class="btn btn-danger delete-row">Delete</button>
+                </td>
+            `;
+
+            tableBody.appendChild(newRow);
+        });
+
+        // Optionally, here you can add logic to update the price when a medicine is selected.
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.classList.contains('medicine-select')) {
+                const selectedMedicineId = e.target.value;
+                const quantityInput = e.target.closest('tr').querySelector('.quantity');
+                const priceInput = e.target.closest('tr').querySelector('[name="price"]');
+                
+                // Fetch the selected medicine details (You can use AJAX or Django template logic)
+                document.addEventListener('change', function(e) {
+    if (e.target && e.target.classList.contains('medicine-select')) {
+        const selectedOption = e.target.selectedOptions[0];  // Get the selected <option>
+        const selectedMedicineId = selectedOption.value;
+        const price = selectedOption.getAttribute('data-price');  // Fetch the price from the data attribute
+        
+        const quantityInput = e.target.closest('tr').querySelector('.quantity');
+        const priceInput = e.target.closest('tr').querySelector('[name="price"]');
+        
+        // Calculate the total price based on the selected quantity
+        const totalPrice = price * quantityInput.value;
+
+        // Update the price input field
+        priceInput.value = totalPrice;
+    }
+});
+
+                // Update price based on selected medicine
+                priceInput.value = selectedMedicine * quantityInput.value;
+            }
+        });
+    </script>
+</body>
+</html>

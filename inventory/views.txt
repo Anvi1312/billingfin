@@ -1,0 +1,292 @@
+# def add_medicine(request):
+#     if request.method == 'POST':
+#         # Get the submitted form data
+#         medicine_id = request.POST.get('medicine')  # Medicine ID to update an existing record
+#         category_id = request.POST.get('category')  # Selected category ID
+#         price = request.POST.get('price')
+#         quantity = int(request.POST.get('quantity'))  # Quantity to be added
+#         expiry_date = request.POST.get('expiry_date')
+#         description = request.POST.get('description')
+#         manufacturer = request.POST.get('manufacturer')
+
+#         if medicine_id:  # If medicine_id is provided, update the existing medicine
+#             try:
+#                 medicine = Medicine.objects.get(id=medicine_id)  # Fetch existing medicine
+#                 medicine.quantity += quantity  # Add quantity to the existing stock
+#                 medicine.price = price  # Update the price if provided
+#                 medicine.expiry_date = expiry_date  # Update expiry date if provided
+#                 medicine.description = description  # Update description if provided
+#                 medicine.manufacturer = manufacturer  # Update manufacturer if provided
+#                 medicine.save()  # Save the updated medicine
+#             except Medicine.DoesNotExist:
+#                 return HttpResponse("Medicine not found.", status=404)
+#         else:  # If no medicine_id is provided, create a new medicine record
+#             # Create and save a new medicine instance
+#             medicine = Medicine(
+#                 name=request.POST.get('name'),
+#                 category=Category.objects.get(id=category_id),
+#                 price=price,
+#                 quantity=quantity,
+#                 description=description,
+#                 expiry_date=expiry_date,
+#                 manufacturer=manufacturer
+#             )
+#             medicine.save()
+
+#         # Redirect to inventory dashboard after the action is complete
+#         return redirect('inventory_dashboard')
+
+#     else:
+#         # For GET requests, fetch all medicines and categories for the form
+#         categories = Category.objects.all()
+#         medicines = Medicine.objects.all()
+        
+#         return render(request, 'add_medicine.html', {
+#             'categories': categories,
+#             'medicines': medicines
+#         })
+
+
+
+
+
+# def inventory_dashboard(request):
+#     medicines = Medicine.objects.all()  # Fetch all medicines from the database
+#     total_medicines = medicines.count()
+#     low_stock_medicines = medicines.filter(quantity__lt=5).count()  # Low stock filter
+#     out_of_stock = medicines.filter(quantity=0).count()  # Out of stock filter
+    
+#     context = {
+#         'medicines': medicines,
+#         'total_medicines': total_medicines,
+#         'low_stock_medicines': low_stock_medicines,
+#         'out_of_stock': out_of_stock,
+#     }
+    
+#     return render(request, 'inventory/dashboard.html', context)
+
+
+
+# from django.shortcuts import render, redirect
+# from django.http import HttpResponse
+# from django.template.loader import get_template
+# from .models import Medicine,  StockOrderItem, Category
+# from .forms import MedicineForm,  StockOrderItemForm, CategoryForm
+# from xhtml2pdf import pisa
+# from django.db import transaction
+# from .models import Medicine  # This is where the import should go
+# # from .models import Medicine, Category  # Add Category here
+
+
+# def inventory_dashboard(request):
+#     medicines = Medicine.objects.all()  # Fetch all medicines from the database
+#     total_medicines = medicines.count()
+#     low_stock_medicines = medicines.filter(stock__lt=5).count()  # Low stock filter
+#     out_of_stock = medicines.filter(stock=0).count()  # Out of stock filter
+    
+#     context = {
+#         'medicines': medicines,
+#         'total_medicines': total_medicines,
+#         'low_stock_medicines': low_stock_medicines,
+#         'out_of_stock': out_of_stock,
+#     }
+
+#     return render(request, 'inventory/dashboard.html', context)
+
+
+# def add_medicine(request):
+#     if request.method == 'POST':
+#         # Your logic to handle the POST request, like saving the medicine to the database
+#         name = request.POST.get('name')
+#         category = request.POST.get('category')
+#         price = request.POST.get('price')
+#         quantity = request.POST.get('quantity')
+#         description = request.POST.get('description')
+#         expiry_date = request.POST.get('expiry_date')
+#         manufacturer = request.POST.get('manufacturer')
+        
+#         # Create a new medicine instance and save it to the database
+#         medicine = Medicine(
+#             name=name, 
+#             category=Category.objects.get(id=category), 
+#             price=price, 
+#             quantity=quantity, 
+#             description=description, 
+#             expiry_date=expiry_date, 
+#             manufacturer=manufacturer
+#         )
+#         medicine.save()
+
+#         # You can add any further logic, like rendering a success page or generating a PDF
+
+#     else:
+#         # Handle GET request if needed
+#         categories = Category.objects.all()
+#         return render(request, 'add_medicine.html', {'categories': categories})
+
+
+#     # def add_medicine(request):
+#     # if request.method == 'POST':
+#     #     medicine_id = request.POST.get('medicine')
+#     #     category_id = request.POST.get('category')
+#     #     price = request.POST.get('price')
+#     #     quantity = request.POST.get('quantity')
+#     #     expiry_date = request.POST.get('expiry_date')
+        
+#     #     medicine = Medicine.objects.get(id=medicine_id)
+#     #     category = Category.objects.get(id=category_id)
+
+#     #     # Add the medicine details to the database
+#     #     new_medicine = Medicine(
+#     #         name=medicine.name,
+#     #         category=category,
+#     #         price=price,
+#     #         quantity=quantity,
+#     #         expiry_date=expiry_date
+#     #     )
+#     #     new_medicine.save()
+
+#     #     # Redirect or render a success message
+#     #     return redirect('add_medicine')
+
+#     # medicines = Medicine.objects.all()
+#     # categories = Category.objects.all()
+
+#     # return render(request, 'add_medicine.html', {'medicines': medicines, 'categories': categories})
+
+# # View to generate the invoice PDF
+# def generate_order_pdf(request):
+#     # Logic to get the last added medicine
+#     last_medicine = Medicine.objects.latest('id')
+
+#     html = render_to_string('invoice_template.html', {'medicine': last_medicine})
+    
+#     # Create a PDF from the HTML
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'inline; filename="invoice.pdf"'
+#     weasyprint.HTML(string=html).write_pdf(response)
+
+#     return response
+
+
+# # def add_medicine(request):
+# #     if request.method == 'POST':
+# #         form = MedicineForm(request.POST)
+# #         if form.is_valid():
+# #             form.save()
+# #             return redirect('inventory_dashboard')
+# #     else:
+# #         form = MedicineForm()
+# #     return render(request, 'add_medicine.html', {'form': form})
+
+
+# def update_stock(request, medicine_id):
+#     medicine = Medicine.objects.get(id=medicine_id)
+#     if request.method == 'POST':
+#         quantity = int(request.POST.get('quantity'))
+#         action = request.POST.get('action')
+
+#         if action == 'add':
+#             medicine.add_stock(quantity)
+#         elif action == 'reduce':
+#             if not medicine.reduce_stock(quantity):
+#                 return HttpResponse("Not enough stock to reduce.", status=400)
+
+#         return redirect('inventory_dashboard')
+    
+#     return render(request, 'update_stock.html', {'medicine': medicine})
+
+
+# def order_stock(request):
+#     if request.method == 'POST':
+#         form = StockOrderForm(request.POST)
+#         if form.is_valid():
+#             stock_order = form.save(commit=False)
+#             stock_order.save()
+
+#             medicines = request.POST.getlist('medicines[]')
+#             quantities = request.POST.getlist('quantities[]')
+#             prices = request.POST.getlist('prices[]')
+
+#             total_amount = 0
+#             for medicine_id, quantity, price in zip(medicines, quantities, prices):
+#                 medicine = Medicine.objects.get(id=medicine_id)
+#                 total_amount += float(price) * int(quantity)
+#                 StockOrderItem.objects.create(
+#                     order=stock_order,
+#                     medicine=medicine,
+#                     quantity=int(quantity),
+#                     price=price
+#                 )
+
+#             stock_order.total_amount = total_amount
+#             stock_order.save()
+
+#             return redirect('inventory_dashboard')
+
+#     else:
+#         form = StockOrderForm()
+
+#     medicines = Medicine.objects.all()
+#     return render(request, 'order_stock.html', {'form': form, 'medicines': medicines})
+
+
+# # def generate_order_pdf(request, order_id):
+# #     order = StockOrder.objects.get(id=order_id)
+# #     items = order.items.all()
+    
+# #     context = {
+# #         'order': order,
+# #         'items': items
+# #     }
+
+# #     template_path = 'order_pdf_template.html'
+# #     response = HttpResponse(content_type='application/pdf')
+# #     response['Content-Disposition'] = f'inline; filename="order_{order_id}.pdf"'
+    
+# #     template = get_template(template_path)
+# #     html = template.render(context)
+# #     pisa.CreatePDF(html, dest=response)
+
+# #     return response
+
+
+
+
+# def add_medicine(request):
+#     if request.method == 'POST':
+#         # Get the posted data
+#         name = request.POST.get('name')
+#         category = request.POST.get('category')
+#         price = request.POST.get('price')
+#         quantity = request.POST.get('quantity')
+#         description = request.POST.get('description')
+#         expiry_date = request.POST.get('expiry_date')
+#         manufacturer = request.POST.get('manufacturer')
+
+#         # Create the Medicine object
+#         medicine = Medicine(
+#             name=name, 
+#             category=Category.objects.get(id=category), 
+#             price=price, 
+#             quantity=quantity, 
+#             description=description, 
+#             expiry_date=expiry_date, 
+#             manufacturer=manufacturer
+#         )
+        
+#         # Save the medicine to the database
+#         medicine.save()
+
+#         # Print to check if it's saving
+#         print(f"Medicine saved: {medicine.name}, {medicine.quantity}, {medicine.price}")
+
+#         # Redirect or render a success message
+#         return redirect('inventory:dashboard')  # Assuming you have a dashboard URL
+
+#     else:
+#         # Handle GET request if needed
+#         categories = Category.objects.all()  # Fetch categories from the database
+#         return render(request, 'add_medicine.html', {
+#             'categories': categories,
+#         })

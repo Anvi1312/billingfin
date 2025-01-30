@@ -1,0 +1,279 @@
+<!-- hospital_billing/templates/hospital_billing/create_bill.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Bill</title>
+    <style>
+        /* General form styling */
+
+        body {
+            position: relative;
+            height: 100vh;
+            margin: 0;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Style form elements */
+        form input,
+        form select,
+        form textarea,
+        form button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        /* Hover effect for inputs */
+        form input:hover,
+        form select:hover,
+        form textarea:hover,
+        form button:hover {
+            border-color: #007bff;
+        }
+
+        /* Button Styling */
+        form button {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        form button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        /* Add spacing between form elements */
+        form p {
+            margin-bottom: 15px;
+        }
+
+        /* CSRF token hidden input */
+        form input[type="hidden"] {
+            display: none;
+        }
+
+        /* Label styling (optional) */
+        form label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            form {
+                padding: 15px;
+            }
+
+            form input,
+            form select,
+            form textarea,
+            form button {
+                padding: 8px;
+            }
+
+            form button {
+                font-size: 14px;
+            }
+        }
+
+        /* Styling for the back button */
+        .back-button {
+            background-color: #f8f9fa;
+            color: #007bff;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            position: absolute;
+            top: 20px;
+            /* Distance from the top of the page */
+            right: 20px;
+            /* Distance from the right of the page */
+        }
+
+        .back-button:hover {
+            background-color: #e2e6ea;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+<h1 style="text-align: center; margin: 50px auto;">Hospital Bill</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }} <!-- Render form fields -->
+        <button type="submit">Generate Bill and Download PDF</button>
+    </form>
+
+    <a href="javascript:history.back()" class="back-button">Go Back</a>
+
+</body>
+
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Hospital Bill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #3a3a3a;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        form label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        form input, form textarea {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Create Hospital Bill</h1>
+        <form method="POST">
+            {% csrf_token %}
+            
+             Render all form fields dynamically 
+            <label for="patient_name">Patient Name:</label>
+            {{ form.patient_name }}
+            
+            <label for="doctor_name">Doctor Name:</label>
+            {{ form.doctor_name }}
+            
+            <label for="service_description">Service Description:</label>
+            {{ form.service_description }}
+            
+            <label for="charges">Charges:</label>
+            {{ form.charges }}
+            
+            <label for="total_amount">Total Amount:</label>
+            {{ form.total_amount }}
+            
+            <label for="gst_number">GST Number:</label>
+            {{ form.gst_number }}
+            
+            <label for="bill_date">Bill Date:</label>
+            {{ form.bill_date }}
+            
+            <button type="submit">Generate Bill and Download PDF</button>
+        </form>
+    </div>
+
+</body>
+</html>
+
+
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Bill Form</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="mt-5">Hospital Bill Form</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="patient_name">Patient Name:</label>
+                <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+            </div>
+            <div class="form-group">
+                <label for="doctor_name">Doctor Name:</label>
+                <input type="text" class="form-control" id="doctor_name" name="doctor_name" required>
+            </div>
+            <div class="form-group">
+                <label for="service_description">Services Provided:</label>
+                <textarea class="form-control" id="service_description" name="service_description" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="charges">Charges:</label>
+                <input type="number" class="form-control" id="charges" name="charges" required>
+            </div>
+            <div class="form-group">
+                <label for="gst_number">GST Number:</label>
+                <input type="text" class="form-control" id="gst_number" name="gst_number" required>
+            </div>
+            <div class="form-group">
+                <label for="total_amount">Total Amount:</label>
+                <input type="number" class="form-control" id="total_amount" name="total_amount" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</body>
+</html> -->

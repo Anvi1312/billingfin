@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .bill { width: 100%; }
+        .bill th, .bill td { padding: 10px; text-align: left; }
+        .total { font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Bill for {{ bill.patient }}</h1>
+    <table class="bill">
+        <thead>
+            <tr>
+                <th>Service</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in bill.billitem_set.all %}
+            <tr>
+                <td>{{ item.service.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.total_price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="total">Total Amount: {{ bill.total_amount }}</p>
+</body>
+</html>

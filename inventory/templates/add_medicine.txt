@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Medicine</title>
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #a0c8ff, #5c6bc0);
+            /* Light blue to purple gradient */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* Container for centering the card */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Card Style */
+        .card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        /* Heading Style */
+        .card h1 {
+            color: #2c387e;
+            /* Dark blue/purple */
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        /* Form Field Styles */
+        form p {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        form label {
+            font-size: 16px;
+            color: #2c387e;
+            /* Dark blue/purple */
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        form input,
+        form select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        form input:focus,
+        form select:focus {
+            border-color: #5c6bc0;
+            /* Blue-purple accent */
+            outline: none;
+            box-shadow: 0 0 5px rgba(92, 107, 192, 0.5);
+        }
+
+        /* Button Styles */
+        .btn {
+            background-color: #5c6bc0;
+            /* Blue-purple accent */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #3f51b5;
+            /* Darker purple */
+        }
+
+        /* Responsive Layout */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            .card {
+                width: 100%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Add New Medicine</h1>
+
+            <form action="{% url 'inventory:add_medicine' %}" method="POST">
+                {% csrf_token %}
+
+
+
+
+                <!-- <form method="POST">
+                    {% csrf_token %}
+                    <label for="medicine">Select Medicine:</label>
+                    <select name="medicine" id="medicine">
+                        {% for medicine in medicines %}
+                            <option value="{{ medicine.id }}">{{ medicine.name }}</option>
+                        {% empty %}
+                            <option>No medicines available</option>
+                        {% endfor %}
+                    </select>
+                
+                    Add other form fields for categories, prices, etc. -->
+                
+                    <!-- <button type="submit">Add Medicine</button>
+                </form>
+                 -->
+                 
+                 <p>
+
+                    <label for="name">Medicine Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    <!-- <label for="medicine">Select Medicine:</label>
+                    <select name="medicine" id="medicine">
+                        {% for medicine in medicines %}
+                            <option value="{{ medicine.id }}">{{ medicine.name }}</option>
+                        {% empty %}
+                            <option>No medicines available</option>
+                        {% endfor %}
+                    </select> -->
+                </p>
+
+                <p>
+                    <label for="category">Category</label>
+                    <select name="category" id="category">
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </p>
+
+                <p>
+                    <label for="manufacturer">Manufacturer</label>
+                    <input type="text" name="manufacturer" id="manufacturer" required>
+                </p>
+
+                <p>
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description" required></textarea>
+
+                </p>
+
+
+                <p>
+                    <label for="price">Price</label>
+                    <input type="number" name="price" id="price" required>
+                </p>
+
+                <p>
+                    <label for="quantity">Quantity</label>
+                    <input type="number" name="quantity" id="quantity" required>
+                </p>
+
+                <p>
+                    <label for="expiry_date">Expiry Date</label>
+                    <input type="date" name="expiry_date" id="expiry_date" required>
+                </p>
+
+                <button type="submit" class="btn">Add Medicine</button>
+            </form>
+            <br>
+
+            <form method="POST" action="{% url 'generate_invoice' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn">Generate Record PDF</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

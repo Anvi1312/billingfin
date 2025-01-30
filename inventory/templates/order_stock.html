@@ -1,0 +1,21 @@
+<h1>Order Stock</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    
+    <label for="medicines">Medicines</label>
+    <select name="medicines[]" multiple>
+        {% for medicine in medicines %}
+        <option value="{{ medicine.id }}">{{ medicine.name }} - {{ medicine.price }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="quantities">Quantities</label>
+    <input type="text" name="quantities[]" placeholder="Enter quantities" required>
+
+    <label for="prices">Prices</label>
+    <input type="text" name="prices[]" placeholder="Enter prices" required>
+
+    <button type="submit">Order Stock</button>
+</form>

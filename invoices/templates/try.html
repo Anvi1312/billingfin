@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #4CAF50;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .total-container {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .delete-row {
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .delete-row:hover {
+            background-color: darkred;
+        }
+
+        .btn-inventory {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-inventory:hover {
+            background-color: darkgreen;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Event listener for medicine selection change
+            document.querySelectorAll(".medicine-dropdown").forEach(dropdown => {
+                dropdown.addEventListener("change", function() {
+                    let selectedOption = this.options[this.selectedIndex];
+                    let priceInput = this.closest("tr").querySelector(".price");
+                    let stock = parseInt(selectedOption.getAttribute("data-stock"));
+
+                    if (priceInput) {
+                        priceInput.value = selectedOption.getAttribute("data-price");
+                    }
+
+                    let qtyInput = this.closest("tr").querySelector(".qty");
+                    qtyInput.setAttribute("max", stock);
+                    qtyInput.value = 1; // Reset quantity to 1
+                    updateTotal(qtyInput);
+                });
+            });
+
+            // Prevent entering more quantity than available stock
+            document.querySelectorAll(".qty").forEach(qtyInput => {
+                qtyInput.addEventListener("input", function() {
+                    let maxStock = parseInt(this.getAttribute("max"));
+                    if (parseInt(this.value) > maxStock) {
+                        this.value = maxStock;  // Prevent exceeding the stock
+                    }
+                    updateTotal(this);
+                });
+            });
+
+            // Add more rows functionality
+            document.getElementById("addRowButton").addEventListener("click", function() {
+                let tableBody = document.getElementById("medicineTableBody");
+                let newRow = tableBody.querySelector("tr").cloneNode(true);
+                newRow.querySelector(".qty").value = 1;
+                newRow.querySelector(".row-total").textContent = "0.00";
+                tableBody.appendChild(newRow);
+            });
+
+            // Delete row functionality
+            document.getElementById("medicineTableBody").addEventListener("click", function(event) {
+                if (event.target.classList.contains("delete-row")) {
+                    event.target.closest("tr").remove();
+                    updateTotal();  // Recalculate total after removing row
+                }
+            });
+        });
+
+        function updateTotal(element) {
+            let total = 0;
+            let rows = document.querySelectorAll("#medicineTableBody tr");
+            rows.forEach(row => {
+                let qty = row.querySelector(".qty").value;
+                let price = row.querySelector(".price").value;
+                let rowTotal = (qty * price) || 0;
+                row.querySelector(".row-total").textContent = rowTotal.toFixed(2);
+                total += rowTotal;
+            });
+            document.getElementById("totalAmount").textContent = "Total: ₹" + total.toFixed(2);
+        }
+    </script>
+</head>
+<body>
+    <h2>Pharmacy Bill</h2>
+    <form method="POST" action="{% url 'generate_invoice' %}">
+        {% csrf_token %}
+        <label for="patient_name">Patient Name:</label>
+        <input type="text" id="patient_name" name="patient_name" required>
+        
+        <label for="doctor_name">Doctor Name:</label>
+        <input type="text" id="doctor_name" name="doctor_name" required>
+
+        <label for="gst_number">GST Number:</label>
+        <input type="text" id="gst_number" name="gst_number" required>
+
+        <label for="bill_date">Bill Date:</label>
+        <input type="date" id="bill_date" name="bill_date" required>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="medicineTableBody">
+                <tr>
+                    <td>
+                        <select name="medicines" class="medicine-dropdown" required>
+                            <option value="">Select Medicine</option>
+                            {% for med in medicines %}
+                            <option value="{{ med.id }}" data-price="{{ med.price }}" data-stock="{{ med.stock }}">{{ med.name }} - Price: ₹{{ med.price }} - Stock: {{ med.stock }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td><input type="number" class="qty" min="1" value="1" oninput="updateTotal(this)" required></td>
+                    <td><input type="number" class="price" readonly></td>
+                    <td class="row-total">0.00</td>
+                    <td><button type="button" class="delete-row">Delete</button></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <button type="button" id="addRowButton">Add More Medicines</button>
+        
+        <div class="total-container">
+            <span id="totalAmount">Total: ₹0.00</span>
+        </div>
+
+        <button type="submit">Generate Invoice</button>
+        <button type="button" onclick="window.print()">Print Invoice</button>
+
+    </form>
+
+    <!-- Inventory Button -->
+    <button class="btn-inventory" onclick="window.location.href='/inventory/'">Go to Inventory</button>
+</body>
+</html>

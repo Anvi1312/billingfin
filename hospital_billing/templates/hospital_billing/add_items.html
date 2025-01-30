@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Items to Bill</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .btn { background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        .btn:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <h1>Add Items to Bill</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <h3>Available Services</h3>
+        {% for service in services %}
+        <label>
+            {{ service.name }} ({{ service.price }})
+            <input type="checkbox" name="service" value="{{ service.id }}">
+            Quantity: <input type="number" name="quantity_{{ service.id }}" min="1">
+        </label><br>
+        {% endfor %}
+        <button type="submit" class="btn">Add Items</button>
+    </form>
+</body>
+</html>

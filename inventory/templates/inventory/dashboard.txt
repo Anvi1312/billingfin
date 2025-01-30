@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #a8c0ff, #3f2b96);
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #4352b5;
+        }
+
+        .dashboard {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 30%;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .card p {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4352b5;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #4352b5;
+            color: white;
+        }
+
+        .btn {
+            background: #4352b5;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+
+        .btn:hover {
+            background: #4352b5;
+        }
+
+        .btn-danger {
+            background: red;
+        }
+
+        .btn-danger:hover {
+            background: darkred;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-inventory {
+            background: #4352b5;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-inventory:hover {
+            background: #4352b5;
+        }
+    </style>
+    <script>
+        function deleteMedicine(medicineId) {
+            if (confirm("Are you sure you want to delete this medicine?")) {
+                fetch(`/inventory/delete/${medicineId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Medicine deleted successfully!");
+                        location.reload();
+                    } else {
+                        alert("Error deleting medicine.");
+                    }
+                });
+            }
+        }
+
+        function deleteMedicine(medicineId) {
+        if (confirm("Are you sure you want to delete this medicine?")) {
+            fetch(`/inventory/delete/${medicineId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",  // Ensure this renders properly
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Medicine deleted successfully!");
+                    location.reload();
+                } else {
+                    alert("Error deleting medicine.");
+                }
+            });
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Inventory Dashboard</h2>
+        
+        <div class="dashboard">
+            <div class="card">
+                <h3>Total Medicines</h3>
+                <p>{{ total_medicines }}</p>
+            </div>
+            <div class="card">
+                <h3>Low Stock Medicines</h3>
+                <p>{{ low_stock_medicines }}</p>
+            </div>
+            <div class="card">
+                <h3>Out of Stock</h3>
+                <p>{{ out_of_stock }}</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Stock</th>
+                    <th>Price</th>
+                    <th>Manufacturer</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for medicine in medicines %}
+                <tr>
+                    <td>{{ medicine.name }}</td>
+                    <td>{{ medicine.quantity }}</td>  <!-- Assuming quantity is the stock number -->
+                    <td>₹{{ medicine.price }}</td>
+                    <td>{{ medicine.manufacturer }}</td>
+                    <td>
+                        <button class="btn" onclick="window.location.href='/inventory/edit/{{ medicine.id }}/'">Edit</button>
+                    </td>
+                    <td>
+                        <form action="{% url 'delete_medicine' medicine.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No medicines available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="action-buttons">
+            <button class="btn" onclick="window.location.href='/inventory/add/'">Add New Medicine</button>
+            <button class="btn-inventory" onclick="window.location.href='/'">Back to Dashboard</button>
+        </div>
+    </div>
+</body>
+</html>

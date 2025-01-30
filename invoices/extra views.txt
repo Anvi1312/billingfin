@@ -1,0 +1,255 @@
+# def generate_invoice(request):
+#     if request.method == 'POST':
+#         patient_name = request.POST.get('patient_name')
+#         doctor_name = request.POST.get('doctor_name')
+#         gst_number = request.POST.get('gst_number')
+#         bill_date = request.POST.get('bill_date')
+
+#         # Retrieve medicine ids and quantities from the POST data
+#         medicines_ids = request.POST.getlist('medicines[]')
+#         quantities = request.POST.getlist('quantities[]')
+
+#         if len(medicines_ids) != len(quantities):
+#             return HttpResponse("Mismatch between the number of medicines and quantities.", status=400)
+
+#         total_amount = 0
+
+#         # Create an invoice record without the total_amount field
+#         invoice = Invoice.objects.create(
+#             patient_name=patient_name,
+#             doctor_name=doctor_name,
+#             gst_number=gst_number,
+#             bill_date=bill_date
+#         )
+
+#         try:
+#             with transaction.atomic():  # Start a transaction
+#                 for medicine_id, qty in zip(medicines_ids, quantities):
+#                     try:
+#                         # Fetch medicine by ID
+#                         medicine = Medicine.objects.get(id=medicine_id)
+#                         price = medicine.price
+#                         qty = int(qty)
+
+#                         # Check stock availability
+#                         if medicine.stock < qty:
+#                             return HttpResponse(f"Not enough stock for {medicine.name}. Available stock: {medicine.stock}", status=400)
+
+#                         # Update stock and save the medicine
+#                         medicine.stock -= qty
+#                         medicine.save()
+
+#                         # Add to the total amount
+#                         total_amount += price * qty
+
+#                         # Create an invoice item record for each medicine
+#                         InvoiceItem.objects.create(
+#                             invoice=invoice,
+#                             medicine=medicine,
+#                             quantity=qty,
+#                             price=price,
+#                             total=price * qty
+#                         )
+
+#                     except Medicine.DoesNotExist:
+#                         return HttpResponse(f"Medicine with ID {medicine_id} not found.", status=400)
+
+#                 # Update the invoice total amount after adding all items
+#                 invoice.total_amount = total_amount
+#                 invoice.save()
+
+#             # Redirect to the invoice view page
+#             return redirect('print_invoice', invoice_id=invoice.id)
+
+#         except Exception as e:
+#             return HttpResponse(f"Error: {str(e)}", status=400)
+
+#     return redirect('invoice_create')  # Fallback in case it's a GET request
+
+
+
+
+# from django.shortcuts import render, redirect
+# from .models import Invoice, InvoiceItem, Medicine
+# from .forms import InvoiceForm
+# from django.http import HttpResponse, JsonResponse
+# from django.template.loader import get_template
+# from xhtml2pdf import pisa
+# from django.shortcuts import render
+# from django.http import HttpResponse
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.pagesizes import letter
+# from .models import Invoice, Medicine, InvoiceItem
+# from .models import Medicine
+# from django.template.loader import render_to_string
+# from weasyprint import HTML
+# from inventory.models import Medicine
+# from .forms import InvoiceForm
+# from django.db import transaction
+# from django.shortcuts import render, redirect
+# from .models import Invoice, InvoiceItem, Medicine
+# from django.http import HttpResponse
+# from django.db import transaction
+# from django.shortcuts import render, redirect
+# from .models import Invoice, InvoiceItem, Medicine
+# from django.http import HttpResponse
+# from django.db import transaction
+# from django.shortcuts import render
+# from django.views.generic import TemplateView
+
+# class InventoryDashboardView(TemplateView):
+#     template_name = 'inventory/dashboard.html'
+
+
+# def generate_invoice(request):
+#     if request.method == 'POST':
+#         patient_name = request.POST.get('patient_name')
+#         doctor_name = request.POST.get('doctor_name')
+#         gst_number = request.POST.get('gst_number')
+#         bill_date = request.POST.get('bill_date')
+
+#         # Retrieve medicine ids and quantities from the POST data
+#         medicines_ids = request.POST.getlist('medicines[]')
+#         quantities = request.POST.getlist('quantities[]')
+
+#         if len(medicines_ids) != len(quantities):
+#             return HttpResponse("Mismatch between the number of medicines and quantities.", status=400)
+
+#         total_amount = 0
+
+#         # Create an invoice record without the total_amount field
+#         invoice = Invoice.objects.create(
+#             patient_name=patient_name,
+#             doctor_name=doctor_name,
+#             gst_number=gst_number,
+#             bill_date=bill_date
+#         )
+
+#         try:
+#             with transaction.atomic():  # Start a transaction
+#                 for medicine_id, qty in zip(medicines_ids, quantities):
+#                     try:
+#                         # Fetch medicine by ID
+#                         medicine = Medicine.objects.get(id=medicine_id)
+#                         price = medicine.price
+#                         qty = int(qty)
+
+#                         # Check stock availability
+#                         if medicine.stock < qty:
+#                             return HttpResponse(f"Not enough stock for {medicine.name}. Available stock: {medicine.stock}", status=400)
+
+#                         # Update stock and save the medicine
+#                         medicine.stock -= qty
+#                         medicine.save()
+
+#                         # Add to the total amount
+#                         total_amount += price * qty
+
+#                         # Create an invoice item record for each medicine
+#                         InvoiceItem.objects.create(
+#                             invoice=invoice,
+#                             medicine=medicine,
+#                             quantity=qty,
+#                             price=price,
+#                             total=price * qty
+#                         )
+
+#                     except Medicine.DoesNotExist:
+#                         return HttpResponse(f"Medicine with ID {medicine_id} not found.", status=400)
+
+#                 # Update the invoice total amount after adding all items
+#                 invoice.total_amount = total_amount
+#                 invoice.save()
+
+#             # Redirect to invoice view page or any other page
+#             return redirect('invoice_create')  # Modify with the proper URL name for displaying invoices
+
+#         except Exception as e:
+#             return HttpResponse(f"Error: {str(e)}", status=400)
+
+#     return redirect('invoice_create')  # Fallback in case it's a GET request
+
+# # View to handle the invoice creation form (optional, depends on the use case)
+# def invoice_create(request):
+
+#     medicines = Medicine.objects.all()  
+#     if request.method == "POST":
+#         invoice_form = InvoiceForm(request.POST)
+#         if invoice_form.is_valid():
+#             invoice = invoice_form.save(commit=False)
+#             invoice.total_amount = 0  # Initializing total_amount as 0
+#             invoice.save()
+
+#             medicines = request.POST.getlist("medicine")  # List of selected medicine IDs
+#             quantities = request.POST.getlist("quantity")  # List of quantities
+
+#             for i in range(len(medicines)):
+#                 medicine = Medicine.objects.get(id=medicines[i])
+#                 quantity = int(quantities[i])
+
+#                 # Check if the requested quantity exceeds available stock
+#                 if quantity > medicine.stock:
+#                     return render(request, 'invoice_create.html', {
+#                         'invoice_form': invoice_form,
+#                         'medicines': Medicine.objects.all(),
+#                         'error_message': f"Cannot sell more than available stock for {medicine.name}.",
+#                     })
+
+#                 total_price = medicine.price * quantity
+#                 invoice.total_amount += total_price
+
+#                 # Create the invoice item
+#                 InvoiceItem.objects.create(
+#                     invoice=invoice,
+#                     medicine=medicine,
+#                     quantity=quantity,
+#                     price=medicine.price,
+#                     total=total_price
+#                 )
+
+#                 # Reduce the stock of the medicine after it's sold
+#                 medicine.stock -= quantity
+#                 medicine.save()
+
+#             invoice.save()
+#             return redirect('print_invoice', invoice_id=invoice.id)
+
+#     else:
+#         invoice_form = InvoiceForm()
+
+#     # Pass invoice form, medicines, and error message (if any) to context
+#     return render(request, 'invoice_create.html', {
+#         'invoice_form': invoice_form,
+#         'medicines': Medicine.objects.all(),
+#         'error_message': None  # Ensure no error message is passed if no error
+#     })
+
+
+
+
+# def print_invoice(request, invoice_id):
+#     invoice = Invoice.objects.get(id=invoice_id)
+#     template_path = 'invoice_pdf.html'
+#     context = {'invoice': invoice}
+    
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = f'inline; filename="invoice_{invoice_id}.pdf"'
+    
+#     template = get_template(template_path)
+#     html = template.render(context)
+#     pisa.CreatePDF(html, dest=response)
+    
+#     return response
+
+# def get_medicine_price(request):
+#     medicine_id = request.GET.get('medicine_id')
+#     medicine = Medicine.objects.filter(id=medicine_id).first()
+#     return JsonResponse({'price': medicine.price if medicine else 0})
+
+# # 
+
+
+
+# # 
+
+

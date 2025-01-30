@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Stock PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .medicine-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .medicine-details th, .medicine-details td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .medicine-details th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .info {
+            margin-bottom: 20px;
+        }
+        .info p {
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Update Stock - PDF</h2>
+    
+    <div class="info">
+        <p><strong>Medicine Name:</strong> {{ medicine.name }}</p>
+        <p><strong>Category:</strong> {{ medicine.category }}</p>
+        <p><strong>Manufacturer:</strong> {{ medicine.manufacturer }}</p>
+        <p><strong>Expiry Date:</strong> {{ medicine.expiry_date }}</p>
+    </div>
+
+    <table class="medicine-details">
+        <thead>
+            <tr>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Description</th>
+                <th>Action Taken</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>₹{{ medicine.price }}</td>
+                <td>{{ medicine.quantity }}</td>
+                <td>{{ medicine.description }}</td>
+                <td>{{ action|capfirst }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p style="text-align: center; margin-top: 20px;">
+        <strong>Update Successful</strong>
+    </p>
+
+</body>
+</html>
